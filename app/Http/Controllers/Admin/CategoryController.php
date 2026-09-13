@@ -3,102 +3,104 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Admin\StoreCategoryRequest;
+use App\Http\Requests\Admin\UpdateCategoryRequest;
 use App\Models\Category;
-use Illuminate\Http\Request;
+use Illuminate\Http\RedirectResponse;
+use Illuminate\View\View;
 
 class CategoryController extends Controller
 {
-    public function index()
+    /**
+     * Display a listing of the categories.
+     */
+    public function index(): View
     {
-        $categories = Category::all();
+        $categories = Category::query()
+            ->with('parent')
+            ->orderBy('title')
+            ->paginate(20);
 
         return view('admin.categories.index', compact('categories'));
     }
 
     /**
-     * Show the form for creating a new resource.
+     * Show the form for creating a new category.
      */
-    public function create()
+    public function create(): View
     {
-        $categories = Category::all();
+        $categories = Category::query()
+            ->orderBy('title')
+            ->get();
 
         return view('admin.categories.create', compact('categories'));
     }
 
     /**
-     * Store a newly created resource in storage.
+     * Store a newly created category.
      */
-    public function store(Request $request)
+    public function store(StoreCategoryRequest $request): RedirectResponse
     {
-        $data = $request->validate([
-            'title' => 'required|string|max:255',
-            'slug' => 'required|string|max:100|unique:categories,slug',
-            'parent_id' => 'nullable|exists:categories,id',
-            'active' => 'required|boolean',
-        ]);
-
-        Category::create($data);
+        Category::create($request->validated());
 
         return redirect()
             ->route('admin.categories.index')
-            ->with('success', 'Категория создана');
+            ->with('success', 'Категория успешно создана.');
     }
 
     /**
-     * Display the specified resource.
+     * Display the specified category.
      */
-    public function show(string $id)
+    public function show(Category $category): View
     {
-        //
-    }
-
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(string $id)
-    {
-        $category = Category::findOrFail($id);
-
-        $categories = Category::where('id', '!=', $id)->get();
-
-        return view(
-            'admin.categories.edit',
-            compact('category', 'categories')
-        );
-    }
-
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(Request $request, string $id)
-    {
-        $category = Category::findOrFail($id);
-
-        $data = $request->validate([
-            'title' => 'required|string|max:255',
-            'slug' => 'required|string|max:100|unique:categories,slug,' . $id,
-            'parent_id' => 'nullable|exists:categories,id',
-            'active' => 'required|boolean',
+        $category->load([
+            'parent',
+            'children',
+//            'products',
         ]);
 
-        $category->update($data);
+        return view('admin.categories.show', compact('category'));
+    }
+
+    /**
+     * Show the form for editing the specified category.
+     */
+    public function edit(Category $category): View
+    {
+        $categories = Category::query()
+            ->where('id', '!=', $category->id)
+            ->orderBy('title')
+            ->get();
+
+        return view('admin.categories.edit', compact(
+            'category',
+            'categories'
+        ));
+    }
+
+    /**
+     * Update the specified category.
+     */
+    public function update(
+        UpdateCategoryRequest $request,
+        Category $category
+    ): RedirectResponse {
+        $category->update($request->validated());
 
         return redirect()
             ->route('admin.categories.index')
-            ->with('success', 'Категория обновлена');
+            ->with('success', 'Категория успешно обновлена.');
     }
 
     /**
-     * Remove the specified resource from storage.
+     * Remove the specified category.
      */
-    public function destroy(string $id)
+    public function destroy(Category $category): RedirectResponse
     {
-        $category = Category::findOrFail($id);
-
         $category->delete();
 
         return redirect()
             ->route('admin.categories.index')
-            ->with('success', 'Категория удалена');
+            ->with('success', 'Категория успешно удалена.');
     }
 }

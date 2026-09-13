@@ -1,49 +1,107 @@
-<!DOCTYPE html>
-<html lang="ru">
-<head>
-    <meta charset="UTF-8">
-    <title>Категории</title>
-</head>
-<body>
+@extends('layouts.main')
 
-<h1>Категории</h1>
+@section('content')
+    <div class="container">
 
-@if($categories->isEmpty())
-    <p>Категорий пока нет.</p>
-@else
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h1>Категории</h1>
 
-    @foreach($categories as $category)
-
-        <div style="margin-bottom: 10px;">
-
-            <strong>
-                {{ $category->title }}
-            </strong>
-
-            <a href="{{ route('admin.categories.edit', $category->id) }}">
-                Редактировать
+            <a href="{{ route('admin.categories.create') }}"
+               class="btn btn-primary">
+                Создать категорию
             </a>
-
-            <form
-                action="{{ route('admin.categories.destroy', $category->id) }}"
-                method="POST"
-                style="display: inline;"
-            >
-
-                @csrf
-                @method('DELETE')
-
-                <button type="submit">
-                    Удалить
-                </button>
-
-            </form>
-
         </div>
 
-    @endforeach
+        @if(session('success'))
+            <div class="alert alert-success">
+                {{ session('success') }}
+            </div>
+        @endif
 
-@endif
+        @if($categories->count())
+            <div class="table-responsive">
+                <table class="table table-bordered table-striped">
+                    <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Название</th>
+                        <th>Slug</th>
+                        <th>Родитель</th>
+                        <th>Статус</th>
+                        <th width="220">Действия</th>
+                    </tr>
+                    </thead>
 
-</body>
-</html>
+                    <tbody>
+                    @foreach($categories as $category)
+                        <tr>
+                            <td>
+                                {{ $category->id }}
+                            </td>
+
+                            <td>
+                                {{ $category->title }}
+                            </td>
+
+                            <td>
+                                {{ $category->slug }}
+                            </td>
+
+                            <td>
+                                {{ $category->parent?->title ?? '—' }}
+                            </td>
+
+                            <td>
+                                @if($category->active)
+                                    <span class="badge bg-success">
+                                        Активна
+                                    </span>
+                                @else
+                                    <span class="badge bg-secondary">
+                                        Неактивна
+                                    </span>
+                                @endif
+                            </td>
+
+                            <td>
+                                <a href="{{ route('admin.categories.show', $category) }}"
+                                   class="btn btn-sm btn-info">
+                                    Просмотр
+                                </a>
+
+                                <a href="{{ route('admin.categories.edit', $category) }}"
+                                   class="btn btn-sm btn-warning">
+                                    Изменить
+                                </a>
+
+                                <form action="{{ route('admin.categories.destroy', $category) }}"
+                                      method="POST"
+                                      class="d-inline"
+                                      onsubmit="return confirm('Удалить категорию?');">
+
+                                    @csrf
+                                    @method('DELETE')
+
+                                    <button type="submit"
+                                            class="btn btn-sm btn-danger">
+                                        Удалить
+                                    </button>
+                                </form>
+                            </td>
+                        </tr>
+                    @endforeach
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="mt-3">
+                {{ $categories->links() }}
+            </div>
+        @else
+            <div class="alert alert-info">
+                Категорий пока нет.
+            </div>
+        @endif
+
+    </div>
+@endsection

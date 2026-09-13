@@ -1,59 +1,132 @@
-<!DOCTYPE html>
-<html lang="ru">
-<head>
-    <meta charset="UTF-8">
-    <title>Создание категории</title>
-</head>
-<body>
+@extends('layouts.main')
 
-<h1>Создать категорию</h1>
+@section('content')
+    <div class="container">
 
-<form action="{{ route('admin.categories.store') }}" method="POST">
-    @csrf
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h1>Создание категории</h1>
 
-    <div>
-        <label>Название:</label>
-        <input type="text" name="title" required>
+            <a href="{{ route('admin.categories.index') }}"
+               class="btn btn-secondary">
+                Назад
+            </a>
+        </div>
+
+        @if($errors->any())
+            <div class="alert alert-danger">
+                <ul class="mb-0">
+                    @foreach($errors->all() as $error)
+                        <li>{{ $error }}</li>
+                    @endforeach
+                </ul>
+            </div>
+        @endif
+
+        <form action="{{ route('admin.categories.store') }}"
+              method="POST">
+
+            @csrf
+
+            <div class="mb-3">
+                <label for="title" class="form-label">
+                    Название
+                </label>
+
+                <input
+                    type="text"
+                    id="title"
+                    name="title"
+                    value="{{ old('title') }}"
+                    class="form-control @error('title') is-invalid @enderror"
+                    required
+                >
+
+                @error('title')
+                    <div class="invalid-feedback">
+                        {{ $message }}
+                    </div>
+                @enderror
+            </div>
+
+            <div class="mb-3">
+                <label for="slug" class="form-label">
+                    Slug
+                </label>
+
+                <input
+                    type="text"
+                    id="slug"
+                    name="slug"
+                    value="{{ old('slug') }}"
+                    class="form-control @error('slug') is-invalid @enderror"
+                    placeholder="smartfony"
+                    required
+                >
+
+                @error('slug')
+                    <div class="invalid-feedback">
+                        {{ $message }}
+                    </div>
+                @enderror
+            </div>
+
+            <div class="mb-3">
+                <label for="parent_id" class="form-label">
+                    Родительская категория
+                </label>
+
+                <select
+                    id="parent_id"
+                    name="parent_id"
+                    class="form-select @error('parent_id') is-invalid @enderror"
+                >
+                    <option value="">
+                        — Без родительской категории —
+                    </option>
+
+                    @foreach($categories as $parent)
+                        <option
+                            value="{{ $parent->id }}"
+                            @selected(old('parent_id') == $parent->id)
+                        >
+                            {{ $parent->title }}
+                        </option>
+                    @endforeach
+                </select>
+
+                @error('parent_id')
+                    <div class="invalid-feedback">
+                        {{ $message }}
+                    </div>
+                @enderror
+            </div>
+
+            <div class="form-check mb-4">
+                <input
+                    type="checkbox"
+                    id="active"
+                    name="active"
+                    value="1"
+                    class="form-check-input"
+                    @checked(old('active', true))
+                >
+
+                <label for="active" class="form-check-label">
+                    Активна
+                </label>
+            </div>
+
+            <button type="submit"
+                    class="btn btn-primary">
+                Создать категорию
+            </button>
+
+            <a href="{{ route('admin.categories.index') }}"
+               class="btn btn-secondary">
+                Отмена
+            </a>
+
+        </form>
+
     </div>
-
-    <br>
-
-    <div>
-        <label>Slug:</label>
-        <input type="text" name="slug" required>
-    </div>
-
-    <br>
-
-    <div>
-        <label>Родительская категория:</label>
-
-        <select name="parent_id">
-            <option value="">Нет</option>
-
-            @foreach($categories as $category)
-                <option value="{{ $category->id }}">
-                    {{ $category->title }}
-                </option>
-            @endforeach
-        </select>
-    </div>
-
-    <br>
-
-    <div>
-        <input type="hidden" name="active" value="0">
-
-        <label>
-            <input type="checkbox" name="active" value="1" checked>
-            Активна
-        </label>
-    </div>
-
-    <br>
-
-    <button type="submit">Создать</button>
-</form>
-
-</body>
-</html>
+@endsection
