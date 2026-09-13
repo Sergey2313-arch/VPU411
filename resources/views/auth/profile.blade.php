@@ -139,7 +139,7 @@
                     <div class="tab-pane fade" id="password" role="tabpanel">
                         <div class="card border-0 shadow-sm">
                             <div class="card-body p-4">
-                                <form method="POST" action="#">
+                                <form method="POST" action="{{ route('profile.password.update') }}">
                                     @csrf
                                     @method('PUT')
 
@@ -226,7 +226,7 @@
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Отмена</button>
-                    <form method="POST" action="#">
+                    <<form method="POST" action="{{ route('profile.avatar.destroy') }}">>
                         @csrf
                         @method('DELETE')
                         <button type="submit" class="btn btn-danger">Удалить</button>

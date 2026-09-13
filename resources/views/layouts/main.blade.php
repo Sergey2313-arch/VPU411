@@ -146,6 +146,81 @@
         .footer-custom .border-top {
             border-color: rgba(255,255,255,0.1) !important;
         }
+        /* ===== АВАТАР ПОЛЬЗОВАТЕЛЯ ===== */
+
+        .profile-dropdown {
+            margin-left: auto;
+        }
+
+        .profile-dropdown .dropdown-toggle {
+            text-decoration: none;
+            padding: 0.4rem 0.6rem;
+        }
+
+
+        .profile-dropdown .dropdown-toggle::after {
+            display: none;
+        }
+
+        .avatar-circle {
+            width: 42px;
+            height: 42px;
+            min-width: 42px;
+            min-height: 42px;
+
+            border-radius: 50%;
+            overflow: hidden;
+
+            display: flex;
+            align-items: center;
+            justify-content: center;
+
+            background: #e94560;
+            color: #ffffff;
+
+            font-size: 18px;
+            font-weight: 700;
+
+            border: 2px solid rgba(255, 255, 255, 0.8);
+
+            flex-shrink: 0;
+        }
+
+        .avatar-circle img {
+            width: 100%;
+            height: 100%;
+
+            object-fit: cover;
+            object-position: center;
+
+            display: block;
+        }
+
+        /* Большая аватарка внутри выпадающего меню */
+        .avatar-circle.avatar-lg {
+            width: 64px;
+            height: 64px;
+            min-width: 64px;
+            min-height: 64px;
+
+            font-size: 26px;
+
+            border: 3px solid #e94560;
+        }
+
+        .profile-menu {
+            min-width: 300px;
+            max-width: 340px;
+        }
+
+        .profile-menu .dropdown-item {
+            display: flex;
+            align-items: center;
+        }
+
+        .profile-header {
+            background: #f8f9fa;
+        }
         .breadcrumb-custom {
             background: #f8f9fa;
             padding: 0.8rem 0;
