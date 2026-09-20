@@ -3,9 +3,10 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Validation\Rule;
-use Illuminate\Support\Facades\Hash;
+
 class ProfileController extends Controller
 {
     public function profile()
@@ -13,7 +14,7 @@ class ProfileController extends Controller
         $user = auth()->user();
 
         return view('auth.profile', [
-            'user' => $user
+            'user' => $user,
         ]);
     }
 
@@ -21,45 +22,47 @@ class ProfileController extends Controller
     {
         $user = auth()->user();
 
-        $request->validate([
+        $validated = $request->validate([
             'name' => [
                 'required',
                 'string',
-                'max:255'
+                'min:3',
+                'max:255',
             ],
 
             'email' => [
                 'required',
                 'email',
-                Rule::unique('users', 'email')->ignore($user->id)
+                Rule::unique('users', 'email')->ignore($user->id),
             ],
 
             'avatar' => [
                 'nullable',
                 'image',
-                'mimes:jpg,jpeg,png,webp',
-                'max:2048'
+                'mimes:jpg,jpeg,png,gif,webp',
+                'max:2048',
             ],
         ]);
 
-        // Обновляем имя и email
-        $user->name = $request->name;
-        $user->email = $request->email;
-
-        // Если пользователь выбрал новую аватарку
+        // Если загружена новая аватарка
         if ($request->hasFile('avatar')) {
 
-            // Удаляем предыдущую аватарку
+            // Удаляем старую аватарку
             if ($user->avatar) {
                 Storage::disk('public')->delete($user->avatar);
             }
 
-            // Сохраняем новую
-            $path = $request->file('avatar')
-                ->store('avatars', 'public');
+            // Сохраняем новую аватарку
+            $path = $request->file('avatar')->store(
+                'avatars',
+                'public'
+            );
 
             $user->avatar = $path;
         }
+
+        $user->name = $validated['name'];
+        $user->email = $validated['email'];
 
         $user->save();
 
