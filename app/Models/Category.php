@@ -2,6 +2,7 @@
 
     namespace App\Models;
 
+use Backpack\CRUD\app\Models\Traits\CrudTrait;
     use Illuminate\Database\Eloquent\Attributes\Fillable;
     use Illuminate\Database\Eloquent\Factories\HasFactory;
     use Illuminate\Database\Eloquent\Model;
@@ -14,9 +15,19 @@
      * @property string $title
      * @property bool $active
      */
-    #[Fillable('parent_id', 'slug', 'title', 'active')]
+#[Fillable(
+    'parent_id',
+    'sort_order',
+    'lft',
+    'rgt',
+    'depth',
+    'slug',
+    'title',
+    'active'
+)]
     class Category extends Model
     {
+    use CrudTrait;
         use HasFactory;
 
         public function parent(): BelongsTo
